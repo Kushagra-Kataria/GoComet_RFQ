@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-heading">
+    <h1>British auctions</h1>
+    <p>Bid deadlines are shown in IST.</p>
+</header>
+{% if auctions %}
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr><th>RFQ</th><th>Lowest bid</th><th>Current close</th><th>Forced close</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            {% for rfq, status in auctions %}
+            <tr>
+                <td><a href="/rfqs/{{ rfq.id }}">{{ rfq.name }}</a><span class="muted">RFQ-{{ rfq.id }}</span></td>
+                <td>{{ rfq.lowest | money }}</td>
+                <td>{{ rfq.current_close | ist }}</td>
+                <td>{{ rfq.forced_close | ist }}</td>
+                <td><span class="status {{ status | lower | replace(' ', '-') }}">{{ status }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="panel">There are no RFQs yet. <a href="/rfqs/new">Create the first RFQ</a>.</p>
+{% endif %}
+{% endblock %}

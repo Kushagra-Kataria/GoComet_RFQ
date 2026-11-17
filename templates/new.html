@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Create RFQ · RFQ Auctions{% endblock %}
+{% block content %}
+<header class="page-heading">
+    <h1>Create RFQ</h1>
+    <p>Configure a British auction. Enter bidding times in IST.</p>
+</header>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<form class="panel form-grid" method="post" action="/rfqs">
+    <label>RFQ name
+        <input required name="name" maxlength="100" value="{{ values.get('name', '') }}">
+    </label>
+    <label>Pickup or service date
+        <input required type="date" name="service_date" value="{{ values.get('service_date', '') }}">
+    </label>
+    <label>Bid start
+        <input required type="datetime-local" name="bid_start" value="{{ values.get('bid_start', '') }}">
+    </label>
+    <label>Initial bid close
+        <input required type="datetime-local" name="initial_close" value="{{ values.get('initial_close', '') }}">
+    </label>
+    <label>Forced close
+        <input required type="datetime-local" name="forced_close" value="{{ values.get('forced_close', '') }}">
+    </label>
+    <label>Extension trigger
+        <select name="trigger_type">
+            {% for key, label in triggers.items() %}
+            <option value="{{ key }}"{% if values.get('trigger_type') == key %} selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>Trigger window X (minutes)
+        <input required type="number" min="1" max="1440" name="trigger_minutes" value="{{ values.get('trigger_minutes', 10) }}">
+    </label>
+    <label>Extension Y (minutes)
+        <input required type="number" min="1" max="1440" name="extension_minutes" value="{{ values.get('extension_minutes', 5) }}">
+    </label>
+    <div><button type="submit">Create auction</button></div>
+</form>
+{% endblock %}

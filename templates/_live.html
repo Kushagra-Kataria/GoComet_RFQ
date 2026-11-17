@@ -1,0 +1,60 @@
+<section class="panel summary" id="auction-clock"
+    data-status="{{ status }}" data-now="{{ now }}"
+    data-target="{{ rfq.bid_start if status == 'Scheduled' else rfq.current_close }}">
+    <div><strong class="status {{ status | lower | replace(' ', '-') }}">{{ status }}</strong></div>
+    <div><span class="muted">Current close</span><strong>{{ rfq.current_close | ist }}</strong></div>
+    <div><span class="muted">Lowest bid</span><strong>{{ (ranking[0].total if ranking else none) | money }}</strong></div>
+    {% if status in ('Scheduled', 'Active') %}
+    <div><span class="muted">{{ 'Starts in' if status == 'Scheduled' else 'Time remaining' }}</span><strong id="countdown">—</strong></div>
+    {% endif %}
+</section>
+
+<h2>Supplier rankings</h2>
+{% if ranking %}
+<div class="table-wrap">
+    <table>
+        <thead><tr><th>Rank</th><th>Carrier</th><th>Current total</th></tr></thead>
+        <tbody>
+            {% for bid in ranking %}
+            <tr><td>L{{ loop.index }}</td><td>{{ bid.carrier_name }}</td><td>{{ bid.total | money }}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}<p>No suppliers have bid yet.</p>{% endif %}
+
+<h2>Quote history</h2>
+{% if bids %}
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr><th>Carrier</th><th>Total</th><th>Freight</th><th>Origin</th><th>Destination</th><th>Transit</th><th>Valid until</th><th>Submitted at</th></tr>
+        </thead>
+        <tbody>
+            {% for bid in bids %}
+            <tr>
+                <td>{{ bid.carrier_name }}</td><td>{{ bid.total | money }}</td>
+                <td>{{ bid.freight | money }}</td><td>{{ bid.origin | money }}</td>
+                <td>{{ bid.destination | money }}</td><td>{{ bid.transit_days }} days</td>
+                <td>{{ bid.valid_until }}</td><td>{{ bid.submitted_at | ist }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}<p>No quotes submitted yet.</p>{% endif %}
+
+<h2>Activity</h2>
+{% if events %}
+<ul class="panel activity">
+    {% for event in events %}
+    <li>
+        <span class="muted">{{ event.submitted_at | ist }}</span>
+        {% if event.event_type == 'extension' %}
+        <strong>Deadline extended</strong> from {{ event.old_close | ist }} to {{ event.new_close | ist }}.
+        {% endif %}
+        {{ event.reason }}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}<p>No activity yet.</p>{% endif %}
